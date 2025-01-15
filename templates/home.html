@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Operations</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        input:focus, select:focus, textarea:focus, button:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .response-container {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .form-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: #4CAF50;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #ffeb3b;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        CRUD Operations Interface
+    </header>
+
+    <main>
+        <h1>Manage Your Data</h1>
+
+        <form id="crudForm">
+            <div class="form-section">
+                <label for="operationType">Select Operation:</label>
+                <select id="operationType">
+                    <option value="">-- Select --</option>
+                    <option value="insert">Insert</option>
+                    <option value="delete">Delete</option>
+                    <option value="update">Update</option>
+                    <option value="show_tables">Show Tables</option>
+                    <option value="custom_query">Custom Query</option>
+                </select>
+            </div>
+
+            <div id="insertSection" class="form-section hidden">
+                <label for="insertTable">Table Name:</label>
+                <input type="text" id="insertTable" placeholder="Enter table name">
+
+                <label for="insertColumns">Columns:</label>
+                <input type="text" id="insertColumns" placeholder="e.g., id, name, email">
+
+                <label for="insertValues">Values:</label>
+                <input type="text" id="insertValues" placeholder="e.g., 1, 'John Doe', 'john@example.com'">
+            </div>
+
+            <div id="deleteSection" class="form-section hidden">
+                <label for="deleteTable">Table Name:</label>
+                <input type="text" id="deleteTable" placeholder="Enter table name">
+
+                <label for="deleteCondition">Condition:</label>
+                <input type="text" id="deleteCondition" placeholder="e.g., id=1">
+            </div>
+
+            <div id="updateSection" class="form-section hidden">
+                <label for="updateTable">Table Name:</label>
+                <input type="text" id="updateTable" placeholder="Enter table name">
+
+                <label for="updateField">Field to Update:</label>
+                <input type="text" id="updateField" placeholder="e.g., name='New Name'">
+
+                <label for="updateCondition">Condition:</label>
+                <input type="text" id="updateCondition" placeholder="e.g., id=1">
+            </div>
+
+            <div id="showTablesSection" class="form-section hidden">
+                <p>No additional input required. Click "Execute" to show tables.</p>
+            </div>
+
+            <div id="customQuerySection" class="form-section hidden">
+                <label for="customQuery">SQL Query:</label>
+                <textarea id="customQuery" rows="5" placeholder="Enter your custom SQL query here..."></textarea>
+            </div>
+
+            <button type="submit">Execute</button>
+        </form>
+
+        <div id="responseContainer" class="response-container hidden"></div>
+    </main>
+
+    <footer>
+        &copy; 2025 CRUD Operations. Designed by abuawaish️. To visit my github account <a href="https://github.com/abuawaish">Click here</a>
+    </footer>
+
+    <script>
+        const operationType = document.getElementById("operationType");
+        const form = document.getElementById("crudForm");
+        const responseContainer = document.getElementById("responseContainer");
+
+        const sections = {
+            insert: document.getElementById("insertSection"),
+            delete: document.getElementById("deleteSection"),
+            update: document.getElementById("updateSection"),
+            show_tables: document.getElementById("showTablesSection"),
+            custom_query: document.getElementById("customQuerySection"),
+        };
+
+        operationType.addEventListener("change", () => {
+            Object.values(sections).forEach(section => section.classList.add("hidden"));
+            if (operationType.value && sections[operationType.value]) {
+                sections[operationType.value].classList.remove("hidden");
+            }
+        });
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const operation = operationType.value;
+
+            let payload = {};
+            if (operation === "insert") {
+                const tableName = document.getElementById("insertTable").value.trim();
+                const columns = document.getElementById("insertColumns").value.trim();
+                const values = document.getElementById("insertValues").value.trim();
+
+                if (!tableName || !columns || !values) {
+                    responseContainer.textContent = "Table name, columns, and values are required for insert.";
+                    responseContainer.classList.remove("hidden");
+                    return;
+                }
+
+                payload = { operation, table_name: tableName, columns, values };
+            } else if (operation === "delete") {
+                const tableName = document.getElementById("deleteTable").value.trim();
+                const condition = document.getElementById("deleteCondition").value.trim();
+
+                if (!tableName || !condition) {
+                    responseContainer.textContent = "Table name and condition are required for delete.";
+                    responseContainer.classList.remove("hidden");
+                    return;
+                }
+
+                payload = { operation, table_name: tableName, condition };
+            } else if (operation === "update") {
+                const tableName = document.getElementById("updateTable").value.trim();
+                const field = document.getElementById("updateField").value.trim();
+                const condition = document.getElementById("updateCondition").value.trim();
+
+                if (!tableName || !field || !condition) {
+                    responseContainer.textContent = "Table name, field, and condition are required for update.";
+                    responseContainer.classList.remove("hidden");
+                    return;
+                }
+
+                payload = { operation, table_name: tableName, field, condition };
+            } else if (operation === "show_tables") {
+                payload = { operation };
+            } else if (operation === "custom_query") {
+                const query = document.getElementById("customQuery").value.trim();
+                if (!query) {
+                    responseContainer.textContent = "Custom query is required.";
+                    responseContainer.classList.remove("hidden");
+                    return;
+                }
+                payload = { query };
+            }
+
+            try {
+                const response = await fetch('/execute_query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await response.json();
+                responseContainer.textContent = JSON.stringify(result, null, 2);
+                responseContainer.classList.remove("hidden");
+            } catch (error) {
+                responseContainer.textContent = `Error: ${error.message}`;
+                responseContainer.classList.remove("hidden");
+            }
+        });
+    </script>
+</body>
+</html>
