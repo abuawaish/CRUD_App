@@ -7,7 +7,7 @@ app = Flask(__name__)
 # Securely load database configuration
 app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST', 'localhost')
 app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', 'root')
-app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', 'Aw@ish7')
+app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', 'YOUR_PASSWORD')
 app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', 'mydb')
 app.secret_key = os.getenv('SECRET_KEY', 'your_secret_key_here')
 
