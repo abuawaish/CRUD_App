@@ -29,9 +29,10 @@ def mysql_connection() -> MySQL:
     instance: MySQL = MySQL(app)
     return instance
 
-
+# calling mysql_config function for mysql configuration
 mysql_config(app)
 
+# calling mysql_connection function for establishing mysql connection
 mysql = mysql_connection()
 
 @app.route('/')
