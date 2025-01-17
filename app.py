@@ -15,10 +15,10 @@ def mysql_config(flask_app: Flask) -> None:
 
     # Load MySQL password from environment variable; replace 'YOUR_PASSWORD' with a secure default if necessary.
     # Note: Avoid hardcoding sensitive information directly in the code.
-    flask_app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', 'Aw@ish7')
+    flask_app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', 'YOUR_PASSWORD')
 
     # Load MySQL database name from environment variable; replace 'YOUR_DATABASE' with your database name.
-    flask_app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', 'mydb')
+    flask_app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', 'YOUR_DATABASE')
 
     # Load Flask secret key from environment variable; use a strong, random string as the default.
     # Important: Keep the secret key secure to protect session data.
