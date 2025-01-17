@@ -131,6 +131,7 @@
                 <label for="operationType">Select Operation:</label>
                 <select id="operationType">
                     <option value="">-- Select --</option>
+                    <option value="fetch_data">Fetch</option>
                     <option value="insert">Insert</option>
                     <option value="delete">Delete</option>
                     <option value="update">Update</option>
@@ -139,6 +140,13 @@
                 </select>
             </div>
 
+            <!-- Fetch Data Section -->
+            <div id="fetchSection" class="form-section hidden">
+                <label for="fetchTable">Table Name:</label>
+                <input type="text" id="fetchTable" placeholder="Enter table name">
+            </div>
+
+            <!-- Insert Section -->
             <div id="insertSection" class="form-section hidden">
                 <label for="insertTable">Table Name:</label>
                 <input type="text" id="insertTable" placeholder="Enter table name">
@@ -150,6 +158,7 @@
                 <input type="text" id="insertValues" placeholder="e.g., 1, 'John Doe', 'john@example.com'">
             </div>
 
+            <!-- Delete Section -->
             <div id="deleteSection" class="form-section hidden">
                 <label for="deleteTable">Table Name:</label>
                 <input type="text" id="deleteTable" placeholder="Enter table name">
@@ -158,6 +167,7 @@
                 <input type="text" id="deleteCondition" placeholder="e.g., id=1">
             </div>
 
+            <!-- Update Section -->
             <div id="updateSection" class="form-section hidden">
                 <label for="updateTable">Table Name:</label>
                 <input type="text" id="updateTable" placeholder="Enter table name">
@@ -169,10 +179,12 @@
                 <input type="text" id="updateCondition" placeholder="e.g., id=1">
             </div>
 
+            <!-- Show Tables Section -->
             <div id="showTablesSection" class="form-section hidden">
                 <p>No additional input required. Click "Execute" to show tables.</p>
             </div>
 
+            <!-- Custom Query Section -->
             <div id="customQuerySection" class="form-section hidden">
                 <label for="customQuery">SQL Query:</label>
                 <textarea id="customQuery" rows="5" placeholder="Enter your custom SQL query here..."></textarea>
@@ -185,7 +197,7 @@
     </main>
 
     <footer>
-        &copy; 2025 CRUD Operations. Designed by abuawaish️. To visit my github account <a href="https://github.com/abuawaish">Click here</a>
+        &copy; 2025 CRUD Operations. Designed by abuawaish️. To visit my GitHub account <a href="https://github.com/abuawaish">Click here</a>
     </footer>
 
     <script>
@@ -194,6 +206,7 @@
         const responseContainer = document.getElementById("responseContainer");
 
         const sections = {
+            fetch_data: document.getElementById("fetchSection"),
             insert: document.getElementById("insertSection"),
             delete: document.getElementById("deleteSection"),
             update: document.getElementById("updateSection"),
@@ -213,14 +226,22 @@
             const operation = operationType.value;
 
             let payload = {};
-            if (operation === "insert") {
+            if (operation === "fetch_data") {
+                const tableName = document.getElementById("fetchTable").value.trim();
+
+                if (!tableName) {
+                    alert("Table name is required for fetching data.");
+                    return;
+                }
+
+                payload = { operation, table_name: tableName };
+            } else if (operation === "insert") {
                 const tableName = document.getElementById("insertTable").value.trim();
                 const columns = document.getElementById("insertColumns").value.trim();
                 const values = document.getElementById("insertValues").value.trim();
 
                 if (!tableName || !columns || !values) {
-                    responseContainer.textContent = "Table name, columns, and values are required for insert.";
-                    responseContainer.classList.remove("hidden");
+                    alert("All fields are required for insert.");
                     return;
                 }
 
@@ -230,8 +251,7 @@
                 const condition = document.getElementById("deleteCondition").value.trim();
 
                 if (!tableName || !condition) {
-                    responseContainer.textContent = "Table name and condition are required for delete.";
-                    responseContainer.classList.remove("hidden");
+                    alert("Table name and condition are required for delete.");
                     return;
                 }
 
@@ -242,8 +262,7 @@
                 const condition = document.getElementById("updateCondition").value.trim();
 
                 if (!tableName || !field || !condition) {
-                    responseContainer.textContent = "Table name, field, and condition are required for update.";
-                    responseContainer.classList.remove("hidden");
+                    alert("All fields are required for update.");
                     return;
                 }
 
@@ -253,8 +272,7 @@
             } else if (operation === "custom_query") {
                 const query = document.getElementById("customQuery").value.trim();
                 if (!query) {
-                    responseContainer.textContent = "Custom query is required.";
-                    responseContainer.classList.remove("hidden");
+                    alert("Custom query is required.");
                     return;
                 }
                 payload = { query };
