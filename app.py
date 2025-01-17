@@ -4,26 +4,35 @@ import os
 
 app = Flask(__name__)
 
+
 # Securely load database configuration
+def mysql_config(flask_app: Flask) -> None:
+    # Load MySQL database host from environment variable; default to 'localhost' if not set.
+    flask_app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST', 'localhost')
 
-# Load MySQL database host from environment variable; default to 'localhost' if not set.
-app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST', 'localhost')
+    # Load MySQL username from environment variable; default to 'root' if not set.
+    flask_app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', 'root')
 
-# Load MySQL username from environment variable; default to 'root' if not set.
-app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', 'root')
+    # Load MySQL password from environment variable; replace 'YOUR_PASSWORD' with a secure default if necessary.
+    # Note: Avoid hardcoding sensitive information directly in the code.
+    flask_app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', 'Aw@ish7')
 
-# Load MySQL password from environment variable; replace 'YOUR_PASSWORD' with a secure default if necessary.
-# Note: Avoid hardcoding sensitive information directly in the code.
-app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', 'YOUR_PASSWORD')
+    # Load MySQL database name from environment variable; replace 'YOUR_DATABASE' with your database name.
+    flask_app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', 'mydb')
 
-# Load MySQL database name from environment variable; replace 'YOUR_DATABASE' with your database name.
-app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', 'YOUR_DATABASE')
+    # Load Flask secret key from environment variable; use a strong, random string as the default.
+    # Important: Keep the secret key secure to protect session data.
+    flask_app.secret_key = os.getenv('SECRET_KEY', 'your_secret_key_here')  # set your own secret key
 
-# Load Flask secret key from environment variable; use a strong, random string as the default.
-# Important: Keep the secret key secure to protect session data.
-app.secret_key = os.getenv('SECRET_KEY', 'your_secret_key_here') # set your own secret key
 
-mysql = MySQL(app)
+def mysql_connection() -> MySQL:
+    instance: MySQL = MySQL(app)
+    return instance
+
+
+mysql_config(app)
+
+mysql = mysql_connection()
 
 @app.route('/')
 def home():
@@ -89,6 +98,16 @@ def execute_query():
                 cursor.execute(query)
                 mysql.connection.commit()
                 result["message"] = f"Data updated successfully in table '{table_name}'"
+
+            elif operation == "fetch_data":
+                table_name = data.get('table_name')
+                if not table_name:
+                    return jsonify({"error": "Table name, field are required for fetch"}), 400
+                query = f'SELECT * FROM {table_name}'
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                column_names = [desc[0] for desc in cursor.description or []]
+                result["data"] = {f"row_{index + 1}": dict(zip(column_names, row)) for index, row in enumerate(rows)}
 
             elif operation == "show_tables":
                 # Show all tables in the database
