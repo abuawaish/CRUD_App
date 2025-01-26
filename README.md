@@ -18,13 +18,14 @@ The directory structure of the project is as follows:
 
 ```bash
   CRUD_App/
-        ├── app.py             # Main application file
-        ├── requirements.txt   # Dependencies required to run the app
-        ├── templates/         # HTML templates for the frontend
-        │   └── home.html      # User Interface for executing sql query
-        ├── .gitignore         # Git ignore file
-        ├── LICENSE            # Project license
-        └── README.md          # Project documentation
+        ├── app.py                 # Main application file
+        ├── requirements.txt       # Dependencies required to run the app
+        ├── templates/             # HTML templates for the frontend
+        │   ├── config_mysql.html  # For self configuration mysql database
+        │   └── home.html          # User Interface for executing sql query
+        ├── .gitignore             # Git ignore file
+        ├── LICENSE                # Project license
+        └── README.md              # Project documentation
 ```
 
 
