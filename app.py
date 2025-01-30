@@ -1,10 +1,11 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_mysqldb import MySQL
-
+from dotenv import load_dotenv
 
 class MysqlApplication:
-    def __init__(self):
+    def __init__(self , secret_key: str  = ""):
+        self.__secret_key = secret_key
         # Initialize Flask app
         self.__app = Flask(__name__)
         self.__database_name = ""
@@ -14,8 +15,16 @@ class MysqlApplication:
         self.__app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', 'root')
         self.__app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', '')
         self.__app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', '')
-        self.__app.secret_key = os.getenv('SECRET_KEY', 'your_secret_key_here')
-        if not os.getenv('SECRET_KEY'):
+
+
+        # Load environment variables from the .env file
+        load_dotenv()
+        self.__app.secret_key = os.environ.get('SECRET_KEY', f'{os.path.join(self.__secret_key)}')
+
+        if self.__secret_key == "" or os.path.join('.env') != '.env':
+            print("Warning: Using a hardcoded secret key. Set SECRET_KEY as an environment variable for production")
+
+        elif "SECRET_KEY" not in os.environ:
             print("Warning: Using a hardcoded secret key. Set SECRET_KEY as an environment variable for production!")
 
         # Initialize MySQL
@@ -46,10 +55,11 @@ class MysqlApplication:
             database = request.form['database']
 
             # Update app configuration dynamically
-            self.__app.config['MYSQL_HOST'] = host
-            self.__app.config['MYSQL_USER'] = username
-            self.__app.config['MYSQL_PASSWORD'] = password
-            self.__app.config['MYSQL_DB'] = database
+            self.__app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST', f'{host}')
+            self.__app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', f'{username}')
+            self.__app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', f'{password}')
+            self.__app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', f'{database}')
+            self.__app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', f'{self.__secret_key}')
             self.__database_name = database
 
             try:
@@ -158,10 +168,12 @@ class MysqlApplication:
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
 
-    def main(self):
+    def execute(self):
         self.__app.run(debug=True, port=5001, host="0.0.0.0")
 
 
 if __name__ == "__main__":
-    MysqlApplication().main()
+    app = MysqlApplication(secret_key='this is my secret_key')
+    # app = MysqlApplication(secret_key='.env')
+    app.execute()
 
