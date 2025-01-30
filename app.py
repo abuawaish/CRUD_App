@@ -21,11 +21,11 @@ class MysqlApplication:
         load_dotenv()
         self.__app.secret_key = os.environ.get('SECRET_KEY', f'{os.path.join(self.__secret_key)}')
 
-        if self.__secret_key == "" or os.path.join('.env') != '.env':
-            print("Warning: Using a hardcoded secret key. Set secret_key as an environment variable by passing your secret key for production!")
+        if self.__secret_key == "" and os.path.join(self.__secret_key).endswith('.env') is False:
+            print("Warning: Using a hardcoded secret key. Set SECRET_KEY as an environment variable for production")
 
-        elif "SECRET_KEY" not in os.environ and os.path.join(self.__secret_key) == '.env':
-            print("Warning: Using a hardcoded secret key. Set SECRET_KEY as an environment variable in .env file for production!")
+        elif "SECRET_KEY" not in os.environ and os.path.join(self.__secret_key).endswith('.env') is True:
+            print("Warning: Using a hardcoded secret key. Set SECRET_KEY as an environment variable for production!")
 
         # Initialize MySQL
         self.__mysql = MySQL(self.__app)
@@ -173,7 +173,10 @@ class MysqlApplication:
 
 
 if __name__ == "__main__":
-    # app = MysqlApplication(secret_key="secret_key")
-    app = MysqlApplication(secret_key='.env')
+    env_path: str = r"C:\Users\HP\OneDrive\Desktop\CRUD_App\.env"
+    app = MysqlApplication(secret_key=env_path)
     app.execute()
+    # app = MysqlApplication()
+    # app = MysqlApplication(secret_key="secret_key")
+    # app = MysqlApplication(secret_key=".env")
 
