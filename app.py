@@ -5,9 +5,12 @@ from dotenv import load_dotenv
 
 class MysqlApplication:
     def __init__(self , secret_key: str  = ""):
-        self.__secret_key = secret_key
+        self.__secret_key = secret_key.strip()
+        self.__load_environment(self.__secret_key)  # Load environment or set secret key
+
         # Initialize Flask app
         self.__app = Flask(__name__)
+        self.__app.secret_key = self.__secret_key
         self.__database_name = ""
 
         # Securely load database configuration
@@ -15,17 +18,6 @@ class MysqlApplication:
         self.__app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', 'root')
         self.__app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', '')
         self.__app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', '')
-
-
-        # Load environment variables from the .env file
-        load_dotenv()
-        self.__app.secret_key = os.environ.get('SECRET_KEY', f'{os.path.join(self.__secret_key)}')
-
-        if self.__secret_key == "" and os.path.join(self.__secret_key).endswith('.env') is False:
-            print("Warning: Using a hardcoded secret key. Set SECRET_KEY as an environment variable for production")
-
-        elif "SECRET_KEY" not in os.environ and os.path.join(self.__secret_key).endswith('.env') is True:
-            print("Warning: Using a hardcoded secret key. Set SECRET_KEY as an environment variable for production!")
 
         # Initialize MySQL
         self.__mysql = MySQL(self.__app)
@@ -35,6 +27,38 @@ class MysqlApplication:
         self.__add_home_routes()
         self.__add_config_mysql()
         self.__add_execute_query()
+
+    def __load_environment(self, env_input: str):
+        """
+        Handles loading the .env file if the user provides a path or filename.
+        If a random string is provided, it's used directly as a secret key.
+        """
+        self.__env_path = None  # Initialize as None
+
+        if env_input:  # If user provides input
+            if os.path.isabs(env_input) or os.path.exists(env_input):
+                self.__env_path = env_input  # Absolute path or existing relative path
+            elif os.path.exists(os.path.join(os.getcwd(), env_input)):
+                self.__env_path = os.path.join(os.getcwd(), env_input)  # File in current dir
+            else:
+                print(f"🔐 Using provided secret key: {env_input}")
+                self.__secret_key = env_input
+                return
+
+        else:  # If no secret key is provided
+            default_env_path = os.path.join(os.getcwd(), ".env")
+            if os.path.exists(default_env_path):  # Only load if .env exists
+                self.__env_path = default_env_path
+
+        # Load environment variables if a valid file is found
+        if self.__env_path and os.path.exists(self.__env_path):
+            load_dotenv(self.__env_path)
+            print(f"✅ Loaded environment variables from: {self.__env_path}")
+            self.__secret_key = os.getenv("SECRET_KEY") or self.__secret_key  # Load from .env
+        else:
+            print(f"⚠️ Warning: No .env file found. Using default secret key.")
+            self.__secret_key = "default_secret_key"
+
 
     def __add_config_routes(self):
         @self.__app.route('/')
@@ -87,11 +111,14 @@ class MysqlApplication:
                 if query:
                     query_type = query.strip().split(' ', 1)[0].lower()
 
-                    if query_type in ['select', 'show', 'call']:
+                    if query_type in ['select', 'show', 'call' , 'describe']:
                         cursor.execute(query)
                         rows = cursor.fetchall()
                         column_names = [desc[0] for desc in cursor.description or []]
-                        result["data"] = {f"row_{index + 1}": dict(zip(column_names, row)) for index, row in enumerate(rows)}
+                        if rows:
+                            result["data"] = {f"row_{index + 1}": dict(zip(column_names, row)) for index, row in enumerate(rows)}
+                        else:
+                            result["message"] = "No data found."
 
                     elif query_type == 'use':
                         try:
@@ -149,12 +176,18 @@ class MysqlApplication:
                         cursor.execute(query)
                         rows = cursor.fetchall()
                         column_names = [desc[0] for desc in cursor.description or []]
-                        result["data"] = {f"row_{index + 1}": dict(zip(column_names, row)) for index, row in enumerate(rows)}
+                        if rows:
+                            result["data"] = {f"row_{index + 1}": dict(zip(column_names, row)) for index, row in enumerate(rows)}
+                        else:
+                            result["message"] = "No data found."
 
                     elif operation == "show_tables":
                         cursor.execute("SHOW TABLES;")
                         tables = cursor.fetchall()
-                        result["tables"] = {f"table_{index + 1}": table[0] for index, table in enumerate(tables)}
+                        if tables:
+                            result["tables"] = {f"table_{index + 1}": table[0] for index, table in enumerate(tables)}
+                        else:
+                            result['message'] = "No tables found."
                     else:
                         return jsonify({"error": "Invalid operation"}), 400
 
@@ -173,10 +206,10 @@ class MysqlApplication:
 
 
 if __name__ == "__main__":
-    env_path: str = r"C:\Users\HP\OneDrive\Desktop\CRUD_App\.env"
-    app = MysqlApplication(secret_key=env_path)
-    app.execute()
+    # env_path: str = r"C:\Users\HP\OneDrive\Desktop\.env"
+    # app = MysqlApplication(secret_key=env_path)
     # app = MysqlApplication()
     # app = MysqlApplication(secret_key="secret_key")
-    # app = MysqlApplication(secret_key=".env")
+    app = MysqlApplication(secret_key=".env")
+    app.execute()
 
