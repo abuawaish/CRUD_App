@@ -1,10 +1,11 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify , Response
+from typing import Any
 from flask_mysqldb import MySQL
 from dotenv import load_dotenv
 
 class MysqlApplication:
-    def __init__(self , secret_key: str  = ""):
+    def __init__(self , secret_key: str  = "") -> None:
         self.__secret_key = secret_key.strip()
         self.__load_environment(self.__secret_key)  # Load environment or set secret key
 
@@ -28,7 +29,7 @@ class MysqlApplication:
         self.__add_config_mysql()
         self.__add_execute_query()
 
-    def __load_environment(self, env_input: str):
+    def __load_environment(self, env_input: str) -> None:
         """
         Handles loading the .env file if the user provides a path or filename.
         If a random string is provided, it's used directly as a secret key.
@@ -60,19 +61,19 @@ class MysqlApplication:
             self.__secret_key = "default_secret_key"
 
 
-    def __add_config_routes(self):
+    def __add_config_routes(self) -> None:
         @self.__app.route('/')
-        def config_mysql_page():
+        def config_mysql_page() -> Any:
             return render_template('config_mysql.html')
 
-    def __add_home_routes(self):
+    def __add_home_routes(self) -> None:
         @self.__app.route('/home')
-        def home():
+        def home() -> Any:
             return render_template('home.html')
 
-    def __add_config_mysql(self):
+    def __add_config_mysql(self) -> None:
         @self.__app.route('/config_mysql', methods=['POST'])
-        def config_mysql():
+        def config_mysql() -> Response:
             host = request.form['host']
             username = request.form['username']
             password = request.form['password']
@@ -97,9 +98,9 @@ class MysqlApplication:
                 flash(f'Error connecting to MySQL: {e}', 'danger')
                 return redirect(url_for('config_mysql_page'))
 
-    def __add_execute_query(self):
+    def __add_execute_query(self) -> None:
         @self.__app.route('/execute_query', methods=['POST'])
-        def execute_query():
+        def execute_query() -> jsonify:
             try:
                 data = request.get_json()
                 operation = data.get('operation')
@@ -201,15 +202,15 @@ class MysqlApplication:
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
 
-    def execute(self):
-        self.__app.run(debug=True, port=5001, host="0.0.0.0")
+    def execute(self,debug_mode: bool = False , port_number: int = 5001 , host_address: str = "0.0.0.0") -> None:
+        self.__app.run(debug=debug_mode, port=port_number, host=host_address)
 
 
 if __name__ == "__main__":
     # env_path: str = r"C:\Users\HP\OneDrive\Desktop\.env"
     # app = MysqlApplication(secret_key=env_path)
     # app = MysqlApplication()
-    # app = MysqlApplication(secret_key="secret_key")
-    app = MysqlApplication(secret_key=".env")
-    app.execute()
-
+    app = MysqlApplication(secret_key="secret_key")
+    # app = MysqlApplication(secret_key=".env")
+    # app.execute() ## It uses the default settings
+    app.execute(port_number=6001,host_address = "127.0.0.1")
