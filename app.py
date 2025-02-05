@@ -112,7 +112,7 @@ class MysqlApplication:
                 if query:
                     query_type = query.strip().split(' ', 1)[0].lower()
 
-                    if query_type in ['select', 'show', 'call' , 'describe']:
+                    if query_type in ['select', 'show', 'describe']:
                         cursor.execute(query)
                         rows = cursor.fetchall()
                         column_names = [desc[0] for desc in cursor.description or []]
@@ -121,11 +121,21 @@ class MysqlApplication:
                         else:
                             result["message"] = "No data found."
 
+                    elif query_type == 'call':
+                        cursor.execute(query)
+                        rows = cursor.fetchall()
+                        column_names = [desc[0] for desc in cursor.description or []]
+                        if rows:
+                            result["data"] = {f"row_{index + 1}": dict(zip(column_names, row)) for index, row in enumerate(rows)}
+                        else:
+                            self.__mysql.connection.commit()
+                            result["message"] = f"{query_type.capitalize()} statement executed successfully."
+
                     elif query_type == 'use':
                         try:
                             cursor.execute(query)
                             db_to_use = query.strip().split(" ")[1].removesuffix(';')
-                            if db_to_use == self.__database_name:
+                            if db_to_use.lower() == self.__database_name.lower():
                                 result["message"] = "You are already using this database."
                             else:
                                 result["message"] = "Cannot switch databases dynamically. Please reconfigure."
@@ -207,10 +217,8 @@ class MysqlApplication:
 
 
 if __name__ == "__main__":
-    # env_path: str = r"C:\Users\HP\OneDrive\Desktop\.env"
-    # app = MysqlApplication(secret_key=env_path)
-    # app = MysqlApplication()
-    app = MysqlApplication(secret_key="secret_key")
+    # app = MysqlApplication(secret_key="secret_key")
     # app = MysqlApplication(secret_key=".env")
-    # app.execute() ## It uses the default settings
-    app.execute(port_number=6001,host_address = "127.0.0.1")
+    app = MysqlApplication()
+    app.execute() ## It uses the default settings
+
