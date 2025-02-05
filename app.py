@@ -129,7 +129,7 @@ class MysqlApplication:
                             result["data"] = {f"row_{index + 1}": dict(zip(column_names, row)) for index, row in enumerate(rows)}
                         else:
                             self.__mysql.connection.commit()
-                            result["message"] = f"{query_type.capitalize()} statement executed successfully."
+                            result["message"] = f"{query_type.upper()} statement executed successfully."
 
                     elif query_type == 'use':
                         try:
@@ -144,7 +144,7 @@ class MysqlApplication:
                     else:
                         cursor.execute(query)
                         self.__mysql.connection.commit()
-                        result["message"] = f"{query_type.capitalize()} query executed successfully."
+                        result["message"] = f"{query_type.upper()} statement executed successfully."
 
                 elif operation:
                     if operation == "insert":
