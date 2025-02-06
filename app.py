@@ -36,6 +36,11 @@ class MysqlApplication:
         """
         self.__env_path = None  # Initialize as None
 
+        if env_input == "":
+            print(f"⚠️ Warning: No secret key is provided. Using default secret key.")
+            self.__secret_key = "default_secret_key"
+            return
+
         if env_input:  # If user provides input
             if os.path.isabs(env_input) or os.path.exists(env_input):
                 self.__env_path = env_input  # Absolute path or existing relative path
@@ -54,8 +59,13 @@ class MysqlApplication:
         # Load environment variables if a valid file is found
         if self.__env_path and os.path.exists(self.__env_path):
             load_dotenv(self.__env_path)
-            print(f"✅ Loaded environment variables from: {self.__env_path}")
-            self.__secret_key = os.getenv("SECRET_KEY") or self.__secret_key  # Load from .env
+            secret_key = os.getenv("SECRET_KEY")
+            if secret_key:
+                self.__secret_key = secret_key
+                print(f"✅ Loaded environment variables from {self.__env_path}")
+            else:
+                print(f"⚠️ Failed to load SECRET_KEY from '{self.__env_path}' The app runs with the default secret key.")
+                self.__secret_key = "default_secret_key"
         else:
             print(f"⚠️ Warning: No .env file found. Using default secret key.")
             self.__secret_key = "default_secret_key"
@@ -80,11 +90,10 @@ class MysqlApplication:
             database = request.form['database']
 
             # Update app configuration dynamically
-            self.__app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST', f'{host}')
-            self.__app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', f'{username}')
-            self.__app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', f'{password}')
-            self.__app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', f'{database}')
-            self.__app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', f'{self.__secret_key}')
+            self.__app.config['MYSQL_HOST'] = host
+            self.__app.config['MYSQL_USER'] = username
+            self.__app.config['MYSQL_PASSWORD'] = password
+            self.__app.config['MYSQL_DB'] = database
             self.__database_name = database
 
             try:
@@ -217,8 +226,6 @@ class MysqlApplication:
 
 
 if __name__ == "__main__":
-    # app = MysqlApplication(secret_key="secret_key")
-    # app = MysqlApplication(secret_key=".env")
-    app = MysqlApplication()
+    app = MysqlApplication(secret_key='my_secret_key')
     app.execute() ## It uses the default settings
 
