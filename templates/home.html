@@ -4,324 +4,384 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRUD Operations</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #2A2F4F;
-            --secondary-color: #4E4FEB;
-            --accent-color: #068FFF;
-            --light-bg: #f8f9ff;
-            --text-dark: #2A2F4F;
+            --primary: #6366f1;
+            --secondary: #4f46e5;
+            --accent: #818cf8;
+            --background: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 280px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --secondary: #6366f1;
+            --accent: #a5b4fc;
+            --background: #0f172a;
+            --text: #f8fafc;
+            --border: #334155;
+            --card-bg: #1e293b;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-bg);
-            color: var(--text-dark);
-        }
-
-        header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 25px;
-            text-align: center;
-            font-size: 1.8em;
-            box-shadow: 0 4px 15px rgba(42, 47, 79, 0.1);
-        }
-
-        main {
-            max-width: 850px;
-            margin: 30px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
-        form {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            transition: var(--transition);
+            line-height: 1.6;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            min-height: 100vh;
         }
 
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 0.5rem;
+            color: var(--text);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(180deg) scale(1.1);
+        }
+
+        /* Form Sections */
+        .operation-section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.4s ease;
+        }
+
+        .response-container {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 2rem;
+            border: 2px solid var(--border);
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: pre-wrap;
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Form Elements */
         label {
-            margin: 10px 0 8px;
+            display: block;
+            margin-bottom: 0.5rem;
             font-weight: 500;
-            color: var(--primary-color);
-            font-size: 0.95em;
+            color: var(--text);
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            background: #ffffff;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            background: var(--card-bg);
+            color: var(--text);
+            transition: var(--transition);
+            margin-bottom: 1rem;
         }
 
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 8px rgba(6, 143, 255, 0.15);
-            outline: none;
-        }
-
-        button {
-            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+        button[type="submit"] {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 14px 25px;
+            padding: 0.875rem 1.5rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 0.5rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 1.05em;
-            font-weight: 500;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            margin-top: 15px;
+            transition: var(--transition);
         }
 
-        button:hover {
+        button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(6, 143, 255, 0.25);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
         }
 
         .hidden {
             display: none;
         }
 
-        .response-container {
-            background: var(--light-bg);
-            border: 2px solid #e0e0e0;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 25px;
-            max-height: 400px;
-            overflow-y: auto;
-            font-family: 'JetBrains Mono', monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            line-height: 1.6;
-            font-size: 0.9em;
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .form-section {
-            margin: 20px 0;
-            padding: 25px;
-            border: 2px solid #f0f0f0;
-            border-radius: 12px;
-            background: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            transition: transform 0.2s ease;
-        }
-
-        .form-section:hover {
-            transform: translateY(-2px);
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 25px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            font-size: 0.9em;
-            box-shadow: 0 -4px 15px rgba(42, 47, 79, 0.1);
-        }
-
-        footer a {
-            color: #ffd700;
-            text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.2s ease;
-        }
-
-        footer a:hover {
-            opacity: 0.85;
-            text-decoration: underline;
-        }
-
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1em;
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         @media (max-width: 768px) {
-            main {
-                margin: 15px;
-                padding: 20px;
+            .sidebar {
+                width: 100%;
+                position: static;
+                height: auto;
             }
 
-            header {
-                font-size: 1.4em;
-                padding: 20px;
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
             }
 
-            .form-section {
-                padding: 18px;
+            .theme-toggle {
+                bottom: 1rem;
+                right: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        CRUD Operations Interface
-    </header>
+    <nav class="sidebar">
+        <h2 style="margin-bottom: 2rem; color: var(--primary);">Operations</h2>
+        <div class="nav-item active" data-operation="fetch_data">
+            <i class="fas fa-download"></i>
+            Fetch Data
+        </div>
+        <div class="nav-item" data-operation="insert">
+            <i class="fas fa-plus-circle"></i>
+            Insert Data
+        </div>
+        <div class="nav-item" data-operation="update">
+            <i class="fas fa-sync-alt"></i>
+            Update Data
+        </div>
+        <div class="nav-item" data-operation="delete">
+            <i class="fas fa-trash-alt"></i>
+            Delete Data
+        </div>
+        <div class="nav-item" data-operation="show_tables">
+            <i class="fas fa-table"></i>
+            Show Tables
+        </div>
+        <div class="nav-item" data-operation="custom_query">
+            <i class="fas fa-terminal"></i>
+            Custom Query
+        </div>
+    </nav>
 
-    <main>
-        <h1>Manage Your Data</h1>
+    <div class="main-content">
+        <header>
+            <h1>Database Operations</h1>
+        </header>
 
         <form id="crudForm">
-            <div class="form-section">
-                <label for="operationType">Select Operation:</label>
-                <select id="operationType">
-                    <option value="">-- Select --</option>
-                    <option value="fetch_data">Fetch</option>
-                    <option value="insert">Insert</option>
-                    <option value="delete">Delete</option>
-                    <option value="update">Update</option>
-                    <option value="show_tables">Show Tables</option>
-                    <option value="custom_query">Custom Query</option>
-                </select>
-            </div>
-
-            <!-- Fetch Data Section -->
-            <div id="fetchSection" class="form-section hidden">
+            <!-- Fetch Section -->
+            <div id="fetchSection" class="operation-section">
                 <label for="fetchTable">Table Name:</label>
                 <input type="text" id="fetchTable" placeholder="Enter table name">
+                <button type="submit">Execute</button>
             </div>
 
             <!-- Insert Section -->
-            <div id="insertSection" class="form-section hidden">
+            <div id="insertSection" class="operation-section hidden">
                 <label for="insertTable">Table Name:</label>
                 <input type="text" id="insertTable" placeholder="Enter table name">
-
                 <label for="insertColumns">Columns:</label>
                 <input type="text" id="insertColumns" placeholder="e.g., id, name, email">
-
                 <label for="insertValues">Values:</label>
                 <input type="text" id="insertValues" placeholder="e.g., 1, 'John Doe', 'john@example.com'">
-            </div>
-
-            <!-- Delete Section -->
-            <div id="deleteSection" class="form-section hidden">
-                <label for="deleteTable">Table Name:</label>
-                <input type="text" id="deleteTable" placeholder="Enter table name">
-
-                <label for="deleteCondition">Condition:</label>
-                <input type="text" id="deleteCondition" placeholder="e.g., id=1">
+                <button type="submit">Execute</button>
             </div>
 
             <!-- Update Section -->
-            <div id="updateSection" class="form-section hidden">
+            <div id="updateSection" class="operation-section hidden">
                 <label for="updateTable">Table Name:</label>
                 <input type="text" id="updateTable" placeholder="Enter table name">
-
                 <label for="updateField">Field to Update:</label>
                 <input type="text" id="updateField" placeholder="e.g., name='New Name'">
-
                 <label for="updateCondition">Condition:</label>
                 <input type="text" id="updateCondition" placeholder="e.g., id=1">
+                <button type="submit">Execute</button>
+            </div>
+
+            <!-- Delete Section -->
+            <div id="deleteSection" class="operation-section hidden">
+                <label for="deleteTable">Table Name:</label>
+                <input type="text" id="deleteTable" placeholder="Enter table name">
+                <label for="deleteCondition">Condition:</label>
+                <input type="text" id="deleteCondition" placeholder="e.g., id=1">
+                <button type="submit">Execute</button>
             </div>
 
             <!-- Show Tables Section -->
-            <div id="showTablesSection" class="form-section hidden">
-                <p>No additional input required. Click "Execute" to show tables.</p>
+            <div id="showTablesSection" class="operation-section hidden">
+                <p>No additional input required.</p>
+                <button type="submit">Show Tables</button>
             </div>
 
             <!-- Custom Query Section -->
-            <div id="customQuerySection" class="form-section hidden">
+            <div id="customQuerySection" class="operation-section hidden">
                 <label for="customQuery">SQL Query:</label>
                 <textarea id="customQuery" rows="5" placeholder="Enter your custom SQL query here..."></textarea>
+                <button type="submit">Execute</button>
             </div>
-
-            <button type="submit">Execute</button>
         </form>
 
         <div id="responseContainer" class="response-container hidden"></div>
-    </main>
+    </div>
 
-    <footer>
-        &copy; 2025 CRUD Operations. Designed by abuawaish️. To visit my GitHub account <a href="https://github.com/abuawaish">Click here</a>
-    </footer>
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+    </div>
 
     <script>
-        const operationType = document.getElementById("operationType");
-        const form = document.getElementById("crudForm");
-        const responseContainer = document.getElementById("responseContainer");
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.querySelector('.theme-toggle i');
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        document.querySelector('.theme-toggle i').className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+
+        // Navigation Handling
+        const navItems = document.querySelectorAll('.nav-item');
         const sections = {
             fetch_data: document.getElementById("fetchSection"),
             insert: document.getElementById("insertSection"),
-            delete: document.getElementById("deleteSection"),
             update: document.getElementById("updateSection"),
+            delete: document.getElementById("deleteSection"),
             show_tables: document.getElementById("showTablesSection"),
-            custom_query: document.getElementById("customQuerySection"),
+            custom_query: document.getElementById("customQuerySection")
         };
 
-        operationType.addEventListener("change", () => {
-            Object.values(sections).forEach(section => section.classList.add("hidden"));
-            if (operationType.value && sections[operationType.value]) {
-                sections[operationType.value].classList.remove("hidden");
-            }
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                const operation = item.dataset.operation;
+                Object.values(sections).forEach(section => section.classList.add('hidden'));
+                if (sections[operation]) {
+                    sections[operation].classList.remove('hidden');
+                }
+            });
         });
 
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const operation = operationType.value;
+        // Form Submission
+        document.getElementById('crudForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const responseContainer = document.getElementById("responseContainer");
+            const activeNav = document.querySelector('.nav-item.active');
+            const operation = activeNav ? activeNav.dataset.operation : null;
 
             let payload = {};
+
             if (operation === "fetch_data") {
                 const tableName = document.getElementById("fetchTable").value.trim();
-
                 if (!tableName) {
                     alert("Table name is required for fetching data.");
                     return;
                 }
-
                 payload = { operation, table_name: tableName };
             } else if (operation === "insert") {
                 const tableName = document.getElementById("insertTable").value.trim();
                 const columns = document.getElementById("insertColumns").value.trim();
                 const values = document.getElementById("insertValues").value.trim();
-
                 if (!tableName || !columns || !values) {
                     alert("All fields are required for insert.");
                     return;
                 }
-
                 payload = { operation, table_name: tableName, columns, values };
             } else if (operation === "delete") {
                 const tableName = document.getElementById("deleteTable").value.trim();
                 const condition = document.getElementById("deleteCondition").value.trim();
-
                 if (!tableName || !condition) {
                     alert("Table name and condition are required for delete.");
                     return;
                 }
-
                 payload = { operation, table_name: tableName, condition };
             } else if (operation === "update") {
                 const tableName = document.getElementById("updateTable").value.trim();
                 const field = document.getElementById("updateField").value.trim();
                 const condition = document.getElementById("updateCondition").value.trim();
-
                 if (!tableName || !field || !condition) {
                     alert("All fields are required for update.");
                     return;
                 }
-
                 payload = { operation, table_name: tableName, field, condition };
             } else if (operation === "show_tables") {
                 payload = { operation };
@@ -331,7 +391,10 @@
                     alert("Custom query is required.");
                     return;
                 }
-                payload = { query };
+                payload = { operation, query };
+            } else {
+                alert("Invalid operation.");
+                return;
             }
 
             try {
