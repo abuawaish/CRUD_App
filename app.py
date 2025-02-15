@@ -142,7 +142,6 @@ class MysqlApplication:
 
                     elif query_type == 'use':
                         try:
-                            cursor.execute(query)
                             db_to_use = query.strip().split(" ")[1].removesuffix(';')
                             if db_to_use.lower() == self.__database_name.lower():
                                 result["message"] = "You are already using this database."
