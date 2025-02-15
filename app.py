@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify , Response
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
 from typing import Any
 from flask_mysqldb import MySQL
 from dotenv import load_dotenv
@@ -114,7 +114,7 @@ class MysqlApplication:
                 data = request.get_json()
                 operation = data.get('operation')
                 query = data.get('query')
-                result = {}
+                result: dict[str, str | dict[Any, Any]] = {}
 
                 cursor = self.__mysql.connection.cursor()
 
@@ -142,6 +142,7 @@ class MysqlApplication:
 
                     elif query_type == 'use':
                         try:
+                            cursor.execute(query)
                             db_to_use = query.strip().split(" ")[1].removesuffix(';')
                             if db_to_use.lower() == self.__database_name.lower():
                                 result["message"] = "You are already using this database."
