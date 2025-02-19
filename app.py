@@ -161,7 +161,7 @@ class MysqlApplication:
                         columns = data.get('columns')
                         values = data.get('values')
                         if not table_name or not columns or not values:
-                            return jsonify({"error": "Table name, columns, and values are required for insert"}), 400
+                            return jsonify({"warning": "Table name, columns, and values are required for insert"}), 400
                         query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
                         cursor.execute(query)
                         self.__mysql.connection.commit()
@@ -171,7 +171,7 @@ class MysqlApplication:
                         table_name = data.get('table_name')
                         condition = data.get('condition')
                         if not table_name or not condition:
-                            return jsonify({"error": "Table name and condition are required for delete"}), 400
+                            return jsonify({"warning": "Table name and condition are required for delete"}), 400
                         query = f"DELETE FROM {table_name} WHERE {condition}"
                         cursor.execute(query)
                         self.__mysql.connection.commit()
@@ -182,7 +182,7 @@ class MysqlApplication:
                         field = data.get('field')
                         condition = data.get('condition')
                         if not table_name or not field or not condition:
-                            return jsonify({"error": "Table name, field, and condition are required for update"}), 400
+                            return jsonify({"warning": "Table name, field, and condition are required for update"}), 400
                         query = f"UPDATE {table_name} SET {field} WHERE {condition}"
                         cursor.execute(query)
                         self.__mysql.connection.commit()
@@ -191,7 +191,7 @@ class MysqlApplication:
                     elif operation == "fetch_data":
                         table_name = data.get('table_name')
                         if not table_name:
-                            return jsonify({"error": "Table name is required for fetch"}), 400
+                            return jsonify({"warning": "Table name is required for fetch"}), 400
                         query = f'SELECT * FROM {table_name}'
                         cursor.execute(query)
                         rows = cursor.fetchall()
@@ -212,14 +212,14 @@ class MysqlApplication:
                         return jsonify({"error": "Invalid operation"}), 400
 
                 else:
-                    return jsonify({"error": "Invalid request"}), 400
+                    return jsonify({"warning": "Custom query is required"}), 400
 
                 cursor.close()
 
                 return jsonify(result)
 
             except Exception as e:
-                return jsonify({'error': str(e)}), 500
+                return jsonify({'error': f'{e}'}), 500
 
     def execute(self,debug_mode: bool = False , port_number: int = 5001 , host_address: str = "0.0.0.0") -> None:
         self.__app.run(debug=debug_mode, port=port_number, host=host_address)
