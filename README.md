@@ -20,6 +20,9 @@ The directory structure of the project is as follows:
   CRUD_App/
         ├── app.py                 # Main application file
         ├── requirements.txt       # Dependencies required to run the app
+        ├── static/                # For holding static images
+        │   ├── config.png         # Header logo for config_mysql page
+        │   └── mysql.png          # Header logo for home page
         ├── templates/             # HTML templates for the frontend
         │   ├── config_mysql.html  # For self configuration mysql database
         │   └── home.html          # User Interface for executing sql query
