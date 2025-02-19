@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRUD Operations</title>
+    <title>CRUD Operations Interface</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -56,6 +56,8 @@
             position: fixed;
             height: 100vh;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .nav-item {
@@ -176,6 +178,55 @@
             display: none;
         }
 
+        /* About Section */
+        .about-section {
+            margin-top: auto;
+            padding: 1.5rem 0 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .about-content {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .about-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .author-info {
+            margin: 0.5rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .author-link {
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            padding: 0.25rem 0;
+        }
+
+        .author-link:hover {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .about-icon {
+            font-size: 1.25rem;
+            width: 24px;
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -232,6 +283,32 @@
         <div class="nav-item" data-operation="custom_query">
             <i class="fas fa-terminal"></i>
             Custom Query
+        </div>
+
+        <!-- About Section -->
+        <div class="about-section">
+            <div class="about-title">
+                <i class="fas fa-info-circle about-icon"></i>
+                About Section
+            </div>
+            <div class="about-content">
+                <p>A modern interface for performing database CRUD operations with real-time feedback and dark/light mode support.</p>
+
+                <div class="author-info">
+                    <div class="author-link">
+                        <i class="fas fa-user-alt"></i>
+                        Abu Awaish
+                    </div>
+                    <a href="mailto:abuawaish7@gmail.com" class="author-link">
+                        <i class="fas fa-envelope"></i>
+                        abuawaish7@gmail.com
+                    </a>
+                    <a href="https://github.com/abuawaish" target="_blank" class="author-link">
+                        <i class="fab fa-github"></i>
+                        github.com/abuawaish
+                    </a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -326,7 +403,7 @@
             update: document.getElementById("updateSection"),
             delete: document.getElementById("deleteSection"),
             show_tables: document.getElementById("showTablesSection"),
-            custom_query: document.getElementById("customQuerySection")
+            custom_query: document.getElementById("customQuerySection"),
         };
 
         navItems.forEach(item => {
@@ -335,69 +412,57 @@
                 item.classList.add('active');
                 const operation = item.dataset.operation;
                 Object.values(sections).forEach(section => section.classList.add('hidden'));
-                if (sections[operation]) {
-                    sections[operation].classList.remove('hidden');
-                }
+                sections[operation].classList.remove('hidden');
             });
         });
 
         // Form Submission
         document.getElementById('crudForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const responseContainer = document.getElementById("responseContainer");
-            const activeNav = document.querySelector('.nav-item.active');
-            const operation = activeNav ? activeNav.dataset.operation : null;
+            const operation = document.querySelector('.nav-item.active').dataset.operation;
 
             let payload = {};
-
-            if (operation === "fetch_data") {
-                const tableName = document.getElementById("fetchTable").value.trim();
-                if (!tableName) {
-                    alert("Table name is required for fetching data.");
-                    return;
-                }
-                payload = { operation, table_name: tableName };
-            } else if (operation === "insert") {
-                const tableName = document.getElementById("insertTable").value.trim();
-                const columns = document.getElementById("insertColumns").value.trim();
-                const values = document.getElementById("insertValues").value.trim();
-                if (!tableName || !columns || !values) {
-                    alert("All fields are required for insert.");
-                    return;
-                }
-                payload = { operation, table_name: tableName, columns, values };
-            } else if (operation === "delete") {
-                const tableName = document.getElementById("deleteTable").value.trim();
-                const condition = document.getElementById("deleteCondition").value.trim();
-                if (!tableName || !condition) {
-                    alert("Table name and condition are required for delete.");
-                    return;
-                }
-                payload = { operation, table_name: tableName, condition };
-            } else if (operation === "update") {
-                const tableName = document.getElementById("updateTable").value.trim();
-                const field = document.getElementById("updateField").value.trim();
-                const condition = document.getElementById("updateCondition").value.trim();
-                if (!tableName || !field || !condition) {
-                    alert("All fields are required for update.");
-                    return;
-                }
-                payload = { operation, table_name: tableName, field, condition };
-            } else if (operation === "show_tables") {
-                payload = { operation };
-            } else if (operation === "custom_query") {
-                const query = document.getElementById("customQuery").value.trim();
-                if (!query) {
-                    alert("Custom query is required.");
-                    return;
-                }
-                payload = { operation, query };
-            } else {
-                alert("Invalid operation.");
-                return;
-            }
+            const getValue = id => document.getElementById(id).value.trim();
 
             try {
+                switch(operation) {
+                    case 'fetch_data':
+                        payload = {
+                            operation,
+                            table_name: getValue('fetchTable')
+                        };
+                        break;
+                    case 'insert':
+                        payload = {
+                            operation,
+                            table_name: getValue('insertTable'),
+                            columns: getValue('insertColumns'),
+                            values: getValue('insertValues')
+                        };
+                        break;
+                    case 'update':
+                        payload = {
+                            operation,
+                            table_name: getValue('updateTable'),
+                            field: getValue('updateField'),
+                            condition: getValue('updateCondition')
+                        };
+                        break;
+                    case 'delete':
+                        payload = {
+                            operation,
+                            table_name: getValue('deleteTable'),
+                            condition: getValue('deleteCondition')
+                        };
+                        break;
+                    case 'show_tables':
+                        payload = { operation };
+                        break;
+                    case 'custom_query':
+                        payload = { query: getValue('customQuery') };
+                        break;
+                }
+
                 const response = await fetch('/execute_query', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -405,11 +470,12 @@
                 });
 
                 const result = await response.json();
+                const responseContainer = document.getElementById('responseContainer');
                 responseContainer.textContent = JSON.stringify(result, null, 2);
-                responseContainer.classList.remove("hidden");
+                responseContainer.classList.remove('hidden');
             } catch (error) {
-                responseContainer.textContent = `Error: ${error.message}`;
-                responseContainer.classList.remove("hidden");
+                console.error('Error:', error);
+                document.getElementById('responseContainer').textContent = `Error: ${error.message}`;
             }
         });
     </script>
