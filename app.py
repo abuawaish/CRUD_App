@@ -142,14 +142,20 @@ class MysqlApplication:
 
                     elif query_type == 'use':
                         try:
-                            cursor.execute(query)
-                            db_to_use = query.strip().split(" ")[1].removesuffix(';')
-                            if db_to_use.lower() == self.__database_name.lower():
-                                result["message"] = "You are already using this database."
+                            tokens = query.strip().rstrip(';').split()
+                            if len(tokens) < 2:
+                                result["message"] = "Invalid USE query: missing database name."
                             else:
-                                result["message"] = "Cannot switch databases dynamically. Please reconfigure."
+                                requested_db = tokens[1].lower()
+                                current_db = self.__database_name.lower()
+
+                                if requested_db == current_db:
+                                    result["message"] = "You are already using this database."
+                                else:
+                                    result["message"] = "Cannot switch databases dynamically. Please reconfigure"
                         except Exception as e:
                             return jsonify({'error': f'{e}'})
+
                     else:
                         cursor.execute(query)
                         self.__mysql.connection.commit()
