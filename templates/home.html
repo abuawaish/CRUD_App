@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRUD Operations Interface</title>
+    <title>Database CRUD Interface</title>
     <link rel="icon" type="image/png" sizes="32x32" href="static/mysql.png"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,6 +19,9 @@
             --shadow: 0 1px 3px rgba(0,0,0,0.1);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --sidebar-width: 280px;
+            --error: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
         }
 
         [data-theme="dark"] {
@@ -30,6 +33,9 @@
             --border: #334155;
             --card-bg: #1e293b;
             --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --error: #ff6b6b;
+            --warning: #ffd93d;
+            --success: #6cff7a;
         }
 
         * {
@@ -48,7 +54,6 @@
             min-height: 100vh;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--card-bg);
@@ -88,14 +93,12 @@
             text-align: center;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
             padding: 2rem;
         }
 
-        /* Theme Toggle */
         .theme-toggle {
             position: fixed;
             bottom: 2rem;
@@ -117,7 +120,6 @@
             transform: rotate(180deg) scale(1.1);
         }
 
-        /* Form Sections */
         .operation-section {
             background: var(--card-bg);
             border-radius: 1rem;
@@ -140,7 +142,42 @@
             animation: fadeIn 0.4s ease;
         }
 
-        /* Form Elements */
+        .response-container.error {
+            color: var(--error);
+            border-color: var(--error);
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .response-container.warning {
+            color: var(--warning);
+            border-color: var(--warning);
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .response-container.success {
+            color: var(--success);
+            border-color: var(--success);
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .sql-error, .sql-warning {
+            color: var(--text);
+            white-space: pre-wrap;
+            line-height: 1.4;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .error-code, .warning-code {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-code { color: var(--error); }
+        .warning-code { color: var(--warning); }
+
         label {
             display: block;
             margin-bottom: 0.5rem;
@@ -179,7 +216,6 @@
             display: none;
         }
 
-        /* About Section */
         .about-section {
             margin-top: auto;
             padding: 1.5rem 0 0;
@@ -228,7 +264,6 @@
             width: 24px;
         }
 
-        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -286,20 +321,18 @@
             Custom Query
         </div>
 
-        <!-- About Section -->
         <div class="about-section">
             <div class="about-title">
                 <i class="fas fa-info-circle about-icon"></i>
                 About Section
             </div>
             <div class="about-content">
-                <p>A modern interface for performing database CRUD operations with real-time feedback and dark/light mode support.</p>
-
+                <p>A professional database interface featuring an enhanced feedback system, developed by :</p>
                 <div class="author-info">
-                    <div class="author-link">
+                    <a href="https://www.linkedin.com/in/abu-awaish-a6523b258/" class="author-link">
                         <i class="fas fa-user-alt"></i>
                         Abu Awaish
-                    </div>
+                    </a>
                     <a href="mailto:abuawaish7@gmail.com" class="author-link">
                         <i class="fas fa-envelope"></i>
                         abuawaish7@gmail.com
@@ -319,14 +352,12 @@
         </header>
 
         <form id="crudForm">
-            <!-- Fetch Section -->
             <div id="fetchSection" class="operation-section">
                 <label for="fetchTable">Table Name:</label>
                 <input type="text" id="fetchTable" placeholder="Enter table name">
                 <button type="submit">Execute</button>
             </div>
 
-            <!-- Insert Section -->
             <div id="insertSection" class="operation-section hidden">
                 <label for="insertTable">Table Name:</label>
                 <input type="text" id="insertTable" placeholder="Enter table name">
@@ -337,7 +368,6 @@
                 <button type="submit">Execute</button>
             </div>
 
-            <!-- Update Section -->
             <div id="updateSection" class="operation-section hidden">
                 <label for="updateTable">Table Name:</label>
                 <input type="text" id="updateTable" placeholder="Enter table name">
@@ -348,7 +378,6 @@
                 <button type="submit">Execute</button>
             </div>
 
-            <!-- Delete Section -->
             <div id="deleteSection" class="operation-section hidden">
                 <label for="deleteTable">Table Name:</label>
                 <input type="text" id="deleteTable" placeholder="Enter table name">
@@ -357,13 +386,11 @@
                 <button type="submit">Execute</button>
             </div>
 
-            <!-- Show Tables Section -->
             <div id="showTablesSection" class="operation-section hidden">
                 <p>No additional input required.</p>
                 <button type="submit">Show Tables</button>
             </div>
 
-            <!-- Custom Query Section -->
             <div id="customQuerySection" class="operation-section hidden">
                 <label for="customQuery">SQL Query:</label>
                 <textarea id="customQuery" rows="5" placeholder="Enter your custom SQL query here..."></textarea>
@@ -379,7 +406,6 @@
     </div>
 
     <script>
-        // Theme Toggle
         function toggleTheme() {
             const body = document.body;
             const themeIcon = document.querySelector('.theme-toggle i');
@@ -391,12 +417,10 @@
             themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         }
 
-        // Initialize theme
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.body.setAttribute('data-theme', savedTheme);
         document.querySelector('.theme-toggle i').className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
 
-        // Navigation Handling
         const navItems = document.querySelectorAll('.nav-item');
         const sections = {
             fetch_data: document.getElementById("fetchSection"),
@@ -417,21 +441,19 @@
             });
         });
 
-        // Form Submission
         document.getElementById('crudForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const operation = document.querySelector('.nav-item.active').dataset.operation;
+            const responseContainer = document.getElementById('responseContainer');
+            responseContainer.classList.add('hidden');
 
+            const operation = document.querySelector('.nav-item.active').dataset.operation;
             let payload = {};
             const getValue = id => document.getElementById(id).value.trim();
 
             try {
                 switch(operation) {
                     case 'fetch_data':
-                        payload = {
-                            operation,
-                            table_name: getValue('fetchTable')
-                        };
+                        payload = { operation, table_name: getValue('fetchTable') };
                         break;
                     case 'insert':
                         payload = {
@@ -471,14 +493,71 @@
                 });
 
                 const result = await response.json();
-                const responseContainer = document.getElementById('responseContainer');
-                responseContainer.textContent = JSON.stringify(result, null, 2);
+                let content = '';
+
+                if (result.error) {
+                    const errorContent = processError(result.error);
+                    content = `
+                        <div class="error-code">SQL Error ${errorContent.code}:</div>
+                        <div class="sql-error">${errorContent.message}</div>
+                    `;
+                    responseContainer.classList.add('error');
+                    responseContainer.classList.remove('warning', 'success');
+                } else if (result.warning) {
+                    content = `
+                        <div class="warning-code">Warning:</div>
+                        <div class="sql-warning">${processWarning(result.warning)}</div>
+                    `;
+                    responseContainer.classList.add('warning');
+                    responseContainer.classList.remove('error', 'success');
+                } else {
+                    let jsonString = JSON.stringify(result, null, 2);
+                    jsonString = jsonString
+                        .replace(/({|}|\[|\])/g, '<span style="color: var(--primary)">$1</span>')
+                        .replace(/"([^"]+)":/g, '<span style="color: var(--success)">"$1"</span>:')
+                        .replace(/: ("[^"]+"|true|false|null|\d+)/g, (match) =>
+                            match.replace(/(["\d\w]+)$/, '<span style="color: var(--accent)">$1</span>'));
+
+                    content = jsonString;
+                    responseContainer.classList.add('success');
+                    responseContainer.classList.remove('error', 'warning');
+                }
+
+                responseContainer.innerHTML = content;
                 responseContainer.classList.remove('hidden');
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('responseContainer').textContent = `Error: ${error.message}`;
+                responseContainer.innerHTML = `
+                    <div class="error-code">Application Error:</div>
+                    <div class="sql-error">${error.message}</div>
+                `;
+                responseContainer.classList.add('error');
+                responseContainer.classList.remove('hidden');
             }
         });
+
+        function processError(errorString) {
+            const errorRegex = /\((\d+),\s*"((?:\\"|\\'|\\n|[^"])+)"\)/;
+            const match = errorString.match(errorRegex);
+
+            if (!match) return { code: '0000', message: errorString };
+
+            return {
+                code: match[1],
+                message: match[2]
+                    .replace(/\\n/g, '\n')
+                    .replace(/\\"/g, '"')
+                    .replace(/\\'/g, "'")
+                    .replace(/\\\\/g, '\\')
+            };
+        }
+
+        function processWarning(warningString) {
+            return warningString
+                .replace(/\\n/g, '\n')
+                .replace(/\\"/g, '"')
+                .replace(/\\'/g, "'")
+                .replace(/\\\\/g, '\\');
+        }
     </script>
 </body>
 </html>
