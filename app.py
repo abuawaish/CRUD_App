@@ -121,7 +121,7 @@ class MysqlApplication:
                 if query:
                     query_type = query.strip().split(' ', 1)[0].lower()
 
-                    if query_type in ['select', 'show', 'describe', 'explain', 'pragma', 'with']:
+                    if query_type in ['select', 'show', 'describe', 'explain', 'with']:
                         cursor.execute(query)
                         rows = cursor.fetchall()
                         column_names = [desc[0] for desc in cursor.description or []]
@@ -155,6 +155,9 @@ class MysqlApplication:
                                     result["message"] = "Cannot switch databases dynamically. Please reconfigure"
                         except Exception as e:
                             return jsonify({'error': f'{e}'})
+
+                    elif query_type == 'help':
+                        return jsonify({"warning": "The help command is not supported yet"})
 
                     else:
                         cursor.execute(query)
