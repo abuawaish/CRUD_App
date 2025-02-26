@@ -121,7 +121,7 @@ class MysqlApplication:
                 if query:
                     query_type = query.strip().split(' ', 1)[0].lower()
 
-                    if query_type in ['select', 'show', 'describe']:
+                    if query_type in ['select', 'show', 'describe', 'explain', 'pragma', 'with']:
                         cursor.execute(query)
                         rows = cursor.fetchall()
                         column_names = [desc[0] for desc in cursor.description or []]
